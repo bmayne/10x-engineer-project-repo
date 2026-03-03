@@ -104,7 +104,32 @@ class TestPrompts:
         assert data["title"] == "Updated Title"
      
         # The updated_at should be different from original
-        assert data["updated_at"] != original_updated_at  # Uncomment after fix
+        assert data["updated_at"] != original_updated_at
+
+    def test_patch_prompt(self, client: TestClient, sample_prompt_data):
+        # Create a prompt first
+        create_response = client.post("/prompts", json=sample_prompt_data)
+        prompt_id = create_response.json()["id"]
+        original_updated_at = create_response.json()["updated_at"]
+        
+        # Update it
+        updated_data = {
+            "content": "Patched content for the prompt",
+            "description": "Patched description"
+        }
+        
+        import time
+        time.sleep(0.1)  # Small delay to ensure timestamp would change
+        
+        response = client.patch(f"/prompts/{prompt_id}", json=updated_data)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["content"] == updated_data["content"]
+        assert data["description"] == updated_data["description"]
+        assert data["title"] == sample_prompt_data["title"]
+     
+        # The updated_at should be different from original
+        assert data["updated_at"] != original_updated_at
     
     def test_sorting_order(self, client: TestClient):
         """Test that prompts are sorted newest first.
