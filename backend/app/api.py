@@ -64,15 +64,12 @@ def list_prompts(
 
 @app.get("/prompts/{prompt_id}", response_model=Prompt)
 def get_prompt(prompt_id: str):
-    # BUG #1: This will raise a 500 error if prompt doesn't exist
-    # because we're accessing .id on None
-    # Should return 404 instead!
+    # This will now properly return a 404 if the prompt doesn't exist
     prompt = storage.get_prompt(prompt_id)
+    if not prompt:
+        raise HTTPException(status_code=404, detail="Prompt not found")
+    return prompt
     
-    # This line causes the bug - accessing attribute on None
-    if prompt.id:
-        return prompt
-
 
 @app.post("/prompts", response_model=Prompt, status_code=201)
 def create_prompt(prompt_data: PromptCreate):
