@@ -35,6 +35,14 @@ app.add_middleware(
 
 @app.get("/health", response_model=HealthResponse)
 def health_check():
+    """Checks the health of the API service.
+
+    Returns:
+        HealthResponse: An object indicating the health status and version of the service.
+
+    Example Usage:
+        curl -X GET http://localhost:8000/health
+    """
     return HealthResponse(status="healthy", version=__version__)
 
 
@@ -45,6 +53,18 @@ def list_prompts(
     collection_id: Optional[str] = None,
     search: Optional[str] = None
 ):
+    """Lists all prompts, with optional filtering and searching.
+
+    Args:
+        collection_id (Optional[str]): ID of the collection to filter by.
+        search (Optional[str]): Search query to filter prompts.
+
+    Returns:
+        PromptList: A list of prompts and total count.
+
+    Example Usage:
+        curl -X GET http://localhost:8000/prompts
+    """
     prompts = storage.get_all_prompts()
     
     # Filter by collection if specified
@@ -63,6 +83,17 @@ def list_prompts(
 
 @app.get("/prompts/{prompt_id}", response_model=Prompt)
 def get_prompt(prompt_id: str):
+    """Gets a specific prompt by prompt ID.
+
+    Args:
+        prompt_id (str): The ID of the prompt to retrieve.
+
+    Returns:
+        Prompt: The requested prompt object.
+
+    Example Usage:
+        curl -X GET http://localhost:8000/prompts/123
+    """
     # This will now properly return a 404 if the prompt doesn't exist
     prompt = storage.get_prompt(prompt_id)
     if not prompt:
@@ -72,6 +103,17 @@ def get_prompt(prompt_id: str):
 
 @app.post("/prompts", response_model=Prompt, status_code=201)
 def create_prompt(prompt_data: PromptCreate):
+    """Creates a new prompt.
+
+    Args:
+        prompt_data (PromptCreate): The data for the new prompt.
+
+    Returns:
+        Prompt: The created prompt object.
+
+    Example Usage:
+        curl -X POST http://localhost:8000/prompts -d '{"title": "New Prompt"}'
+    """
     # Validate collection exists if provided
     if prompt_data.collection_id:
         collection = storage.get_collection(prompt_data.collection_id)
@@ -84,6 +126,18 @@ def create_prompt(prompt_data: PromptCreate):
 
 @app.put("/prompts/{prompt_id}", response_model=Prompt)
 def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
+    """Updates a specific prompt with new data.
+
+    Args:
+        prompt_id (str): The ID of the prompt to update.
+        prompt_data (PromptUpdate): The new data for the prompt.
+
+    Returns:
+        Prompt: The updated prompt object.
+
+    Example Usage:
+        curl -X PUT http://localhost:8000/prompts/123 -d '{"title": "Updated Title"}'
+    """
     existing = storage.get_prompt(prompt_id)
     if not existing:
         raise HTTPException(status_code=404, detail="Prompt not found")
@@ -109,6 +163,18 @@ def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
 
 @app.patch("/prompts/{prompt_id}", response_model=Prompt)
 def patch_prompt(prompt_id: str, prompt_data: PromptPatch):
+    """Patches a specific prompt with partial updates.
+
+    Args:
+        prompt_id (str): The ID of the prompt to patch.
+        prompt_data (PromptPatch): The fields to update in the prompt.
+
+    Returns:
+        Prompt: The patched prompt object.
+
+    Example Usage:
+        curl -X PATCH http://localhost:8000/prompts/123 -d '{"content": "Updated Content"}'
+    """
     existing = storage.get_prompt(prompt_id)
     if not existing:
         raise HTTPException(status_code=404, detail="Prompt not found")
@@ -133,6 +199,17 @@ def patch_prompt(prompt_id: str, prompt_data: PromptPatch):
 
 @app.delete("/prompts/{prompt_id}", status_code=204)
 def delete_prompt(prompt_id: str):
+    """Deletes a specific prompt.
+
+    Args:
+        prompt_id (str): The ID of the prompt to delete.
+
+    Returns:
+        None
+
+    Example Usage:
+        curl -X DELETE http://localhost:8000/prompts/123
+    """
     if not storage.delete_prompt(prompt_id):
         raise HTTPException(status_code=404, detail="Prompt not found")
     return None
@@ -142,12 +219,31 @@ def delete_prompt(prompt_id: str):
 
 @app.get("/collections", response_model=CollectionList)
 def list_collections():
+    """Lists all collections.
+
+    Returns:
+        CollectionList: A list of collections and total count.
+
+    Example Usage:
+        curl -X GET http://localhost:8000/collections
+    """
     collections = storage.get_all_collections()
     return CollectionList(collections=collections, total=len(collections))
 
 
 @app.get("/collections/{collection_id}", response_model=Collection)
 def get_collection(collection_id: str):
+    """Gets a specific collection by collection ID.
+
+    Args:
+        collection_id (str): The ID of the collection to retrieve.
+
+    Returns:
+        Collection: The requested collection object.
+
+    Example Usage:
+        curl -X GET http://localhost:8000/collections/456
+    """
     collection = storage.get_collection(collection_id)
     if not collection:
         raise HTTPException(status_code=404, detail="Collection not found")
@@ -156,12 +252,34 @@ def get_collection(collection_id: str):
 
 @app.post("/collections", response_model=Collection, status_code=201)
 def create_collection(collection_data: CollectionCreate):
+    """Creates a new collection.
+
+    Args:
+        collection_data (CollectionCreate): The data for the new collection.
+
+    Returns:
+        Collection: The created collection object.
+
+    Example Usage:
+        curl -X POST http://localhost:8000/collections -d '{"name": "New Collection"}'
+    """
     collection = Collection(**collection_data.model_dump())
     return storage.create_collection(collection)
 
 
 @app.delete("/collections/{collection_id}", status_code=204)
 def delete_collection(collection_id: str):
+    """Deletes a specific collection and updates related prompts.
+
+    Args:
+        collection_id (str): The ID of the collection to delete.
+
+    Returns:
+        None
+
+    Example Usage:
+        curl -X DELETE http://localhost:8000/collections/456
+    """
     # Retrieve all existing prompts
     all_prompts = storage.get_all_prompts()
 
