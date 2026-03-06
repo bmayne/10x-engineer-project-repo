@@ -4,164 +4,127 @@
 
 ---
 
-## Welcome to the Team! 👋
+## Project Overview
 
-Congratulations on joining the PromptLab engineering team! You've been brought on to help us build the next generation of prompt engineering tools.
+PromptLab is a robust AI Prompt Engineering Platform designed to facilitate the management and organization of AI prompts. It allows teams to streamline their workflow by enabling them to store, edit, and test AI prompt templates. With integrated features like prompt organization, tagging, and version control, PromptLab aims to enhance productivity and efficiency in AI development.
 
-### What is PromptLab?
+## Features
 
-PromptLab is an internal tool for AI engineers to **store, organize, and manage their prompts**. Think of it as a "Postman for Prompts" — a professional workspace where teams can:
-
-- 📝 Store prompt templates with variables (`{{input}}`, `{{context}}`)
-- 📁 Organize prompts into collections
-- 🏷️ Tag and search prompts
-- 📜 Track version history
-- 🧪 Test prompts with sample inputs
-
-### The Current Situation
-
-The previous developer left us with a *partially working* backend. The core structure is there, but:
-
-- There are **several bugs** that need fixing
-- Some **features are incomplete**
-- The **documentation is minimal** (you'll fix that)
-- There are **no tests** worth mentioning
-- **No CI/CD pipeline** exists
-- **No frontend** has been built yet
-
-Your job over the next 4 weeks is to transform this into a **production-ready, full-stack application**.
+- **Prompt Organization**: Tagging, categorization, and easy search functionality.
+- **Version Control**: Track changes and maintain prompt versions.
+- **Collaboration Tools**: Shared spaces and collaborative editing.
+- **Integration Ready**: Seamlessly connect with other AI tools and platforms.
 
 ---
 
-## Quick Start
+## Prerequisites and Installation
 
 ### Prerequisites
+- **Python** 3.10 or higher
+- **Node.js** 18 or higher (required from Week 4 for the frontend development)
+- **Git**
 
-- Python 3.10+
-- Node.js 18+ (for Week 4)
-- Git
+### Installation Steps
 
-### Run Locally
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd promptlab
+   ```
+
+2. **Set up and run the backend**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   python main.py
+   ```
+
+The API will be accessible at: [http://localhost:8000](http://localhost:8000).
+
+API Documentation can be viewed at: [http://localhost:8000/docs](http://localhost:8000/docs).
+
+---
+
+## Quick Start Guide
 
 ```bash
-# Clone the repo
+# Clone the repository
 git clone <your-repo-url>
 cd promptlab
 
-# Set up backend
+# Set up and run the backend
 cd backend
 pip install -r requirements.txt
 python main.py
 ```
 
-API runs at: http://localhost:8000
+Visit [http://localhost:8000/docs](http://localhost:8000/docs) for detailed API usage.
 
-API docs at: http://localhost:8000/docs
+---
 
-### Run Tests
+## API Endpoint Summary
+
+| Method | Endpoint                  | Description                                      |
+|--------|---------------------------|--------------------------------------------------|
+| GET    | `/health`                 | Check API health status                          |
+| GET    | `/prompts`                | Retrieve a list of all prompts (filterable)      |
+| GET    | `/prompts/{prompt_id}`    | Retrieve a specific prompt by its ID             |
+| POST   | `/prompts`                | Create a new prompt                              |
+| PUT    | `/prompts/{prompt_id}`    | Update an existing prompt                        |
+| PATCH  | `/prompts/{prompt_id}`    | Partially update a prompt                        |
+| DELETE | `/prompts/{prompt_id}`    | Delete a prompt                                  |
+| GET    | `/collections`            | Retrieve all collections                         |
+| GET    | `/collections/{collection_id}` | Get a specific collection by ID              |
+| POST   | `/collections`            | Create a new collection                          |
+| DELETE | `/collections/{collection_id}` | Delete a collection                              |
+
+### Usage Examples
+
+#### Creating a new Prompt
+
+```bash
+# POST request to create a new prompt
+curl -X POST http://localhost:8000/prompts \
+-H "Content-Type: application/json" \
+-d '{"title": "New Prompt", "content": "Sample content here..."}'
+```
+
+#### Listing collection prompts
+
+```bash
+# GET request to list prompts
+curl -X GET 'http://localhost:8000/prompts?collection_id=exampleCollectionId'
+```
+
+#### Updating a Prompt
+
+```bash
+# PUT request to update a prompt
+curl -X PUT http://localhost:8000/prompts/<prompt_id> \
+-H "Content-Type: application/json" \
+-d '{"title": "Updated Title", "content": "Updated content...", "collection_id": "exampleCollectionId"}'
+```
+
+---
+
+## Development Setup
+
+To set up the development environment, ensure all prerequisites are installed, and follow the installation steps.
+Use the following command to run tests and ensure the environment is correctly configured:
 
 ```bash
 cd backend
 pytest tests/ -v
 ```
 
----
+## Contributing Guidelines
 
-## Project Structure
+We welcome contributions to improve PromptLab. Please follow these guidelines:
 
-```
-promptlab/
-├── README.md                    # You are here
-├── PROJECT_BRIEF.md             # Your assignment details
-├── GRADING_RUBRIC.md            # How you'll be graded
-│
-├── backend/
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── api.py              # FastAPI routes (has bugs!)
-│   │   ├── models.py           # Pydantic models
-│   │   ├── storage.py          # In-memory storage
-│   │   └── utils.py            # Helper functions
-│   ├── tests/
-│   │   ├── __init__.py
-│   │   ├── test_api.py         # Basic tests
-│   │   └── conftest.py         # Test fixtures
-│   ├── main.py                 # Entry point
-│   └── requirements.txt
-│
-├── frontend/                    # You'll create this in Week 4
-├── specs/                       # You'll create this in Week 2
-├── docs/                        # You'll create this in Week 2
-└── .github/                     # You'll set up CI/CD in Week 3
-```
+1. **Fork the repository** and create a new branch for your feature or fix.
+2. **Ensure code quality** and test your changes thoroughly.
+3. **Submit a pull request** with a detailed description of the changes.
 
----
+For more details, refer to the `CONTRIBUTING.md` file in the repo.
 
-## Your Mission
-
-### 🧪 Experimentation Encouraged!
-While we provide guidelines, **you are the engineer**. If you see a better way to solve a problem using AI, do it!
-- Want to swap the storage layer for a real database? **Go for it.**
-- Want to add Authentication? **Do it.**
-- Want to rewrite the API in a different style? **As long as tests pass, you're clear.**
-
-The goal is to learn how to build *better* software *faster* with AI. Don't be afraid to break things and rebuild them better.
-
-### Week 1: Fix the Backend
-- Understand this codebase using AI
-- Find and fix the bugs
-- Implement missing features
-
-### Week 2: Document Everything
-- Write proper documentation
-- Create feature specifications
-- Set up coding standards
-
-### Week 3: Make it Production-Ready
-- Write comprehensive tests
-- Implement new features with TDD
-- Set up CI/CD and Docker
-
-### Week 4: Build the Frontend
-- Create a React frontend
-- Connect it to the backend
-- Polish the user experience
-
----
-
-## API Endpoints (Current)
-
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|--------|
-| GET | `/health` | Health check | ✅ Works |
-| GET | `/prompts` | List all prompts | ⚠️ Has issues |
-| GET | `/prompts/{id}` | Get single prompt | ❌ Bug |
-| POST | `/prompts` | Create prompt | ✅ Works |
-| PUT | `/prompts/{id}` | Update prompt | ⚠️ Has issues |
-| DELETE | `/prompts/{id}` | Delete prompt | ✅ Works |
-| GET | `/collections` | List collections | ✅ Works |
-| GET | `/collections/{id}` | Get collection | ✅ Works |
-| POST | `/collections` | Create collection | ✅ Works |
-| DELETE | `/collections/{id}` | Delete collection | ❌ Bug |
-
----
-
-## Tech Stack
-
-- **Backend**: Python 3.10+, FastAPI, Pydantic
-- **Frontend**: React, Vite (Week 4)
-- **Testing**: pytest
-- **DevOps**: Docker, GitHub Actions (Week 3)
-
----
-
-## Need Help?
-
-1. **Use AI tools** — This is an AI-assisted coding course!
-2. Read the `PROJECT_BRIEF.md` for detailed instructions
-3. Check `GRADING_RUBRIC.md` to understand expectations
-4. Ask questions in the course forum
-
----
-
-Good luck, and welcome to the team! 🚀
+These guidelines ensure a smooth collaboration process and help maintain the code quality.
