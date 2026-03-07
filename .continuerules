@@ -1,0 +1,26 @@
+## Project Coding Standards
+- Use 4 spaces for indentation.
+- Follow PEP 8 guidelines for Python code.
+- Variables should be named using snake_case.
+- Classes should be named using CamelCase.
+
+## Preferred Patterns and Conventions
+- Utilize list comprehensions where applicable for cleaner and more Pythonic code.
+- Follow DRY (Don't Repeat Yourself) principle to minimize code repetition.
+- Prefer dictionary and set default methods for safe key access.
+- Utilize context managers for resource management (e.g., `with open() as file:`).
+
+## File Naming Conventions
+- Python files should use lowercase letters and underscores for separation, e.g., `data_processor.py`.
+- Test files should follow the structure `test_<module_name>.py`.
+
+## Error Handling Approach
+- Use try-except blocks to handle exceptions gracefully.
+- Log errors using Python's `logging` module instead of printing them.
+- Raise exceptions with informative messages where applicable.
+
+## Testing Requirements
+- All new features should have corresponding unit tests.
+- Aim for comprehensive test coverage for each module.
+- Use `unittest` or `pytest` for writing and running test cases.
+- Mock external dependencies to ensure tests are deterministic.
