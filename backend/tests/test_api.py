@@ -127,10 +127,7 @@ class TestPrompts:
         assert data["updated_at"] != original_updated_at
     
     def test_sorting_order(self, client: TestClient):
-        """Test that prompts are sorted newest first.
-        
-        NOTE: This test might fail due to Bug #3!
-        """
+        """Test that prompts are sorted newest first."""
         import time
         
         # Create prompts with delay
@@ -145,8 +142,29 @@ class TestPrompts:
         prompts = response.json()["prompts"]
         
         # Newest (Second) should be first
-        assert prompts[0]["title"] == "Second"  # Will fail until Bug #3 fixed
+        assert prompts[0]["title"] == "Second"
 
+    def test_get_prompt_invalid_id(self, client: TestClient):
+        response = client.get("/prompts/invalid-id")
+        assert response.status_code == 404
+
+    def test_create_prompt_empty_title(self, client: TestClient, sample_prompt_data):
+        sample_prompt_data["title"] = ""
+        response = client.post("/prompts", json=sample_prompt_data)
+        assert response.status_code == 422
+
+    def test_query_prompts_with_sorting(self, client: TestClient, sample_prompt_data):
+        # Create multiple prompts
+        prompt1 = {"title": "First", "content": "A content"}
+        prompt2 = {"title": "Second", "content": "B content"}
+        client.post("/prompts", json=prompt1)
+        client.post("/prompts", json=prompt2)
+
+        response = client.get("/prompts?sort_by=title&sort_order=asc")
+        data = response.json()
+        prompts = data["prompts"]
+        # Test sorting order by title
+        assert prompts[0]["title"] == "First"
 
 class TestCollections:
     """Tests for collection endpoints."""
@@ -187,3 +205,26 @@ class TestCollections:
         prompts = client.get("/prompts").json()["prompts"]
         if prompts:
             assert prompts[0]["collection_id"] is None
+
+    def test_create_collection_with_special_characters(self, client: TestClient, sample_collection_data):
+        sample_collection_data["name"] = "!@#$%^&*()"
+        response = client.post("/collections", json=sample_collection_data)
+        assert response.status_code == 201
+
+    def test_list_collections_with_filter(self, client: TestClient, sample_collection_data):
+        # Create several collections
+        collection1 = {**sample_collection_data, "name": "Alpha"}
+        collection2 = {**sample_collection_data, "name": "Beta"}
+        
+        client.post("/collections", json=collection1)
+        client.post("/collections", json=collection2)
+        
+        # Test filtering collections by name containing "Alpha"
+        response = client.get("/collections?filter_by=name&search=Alpha")
+        assert response.status_code == 200
+        data = response.json()
+        collections = data["collections"]
+        
+        # Assert that only the filtered collection is returned
+        assert len(collections) == 1
+        assert collections[0]["name"] == "Alpha"

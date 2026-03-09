@@ -1,6 +1,6 @@
 """FastAPI routes for PromptLab"""
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 
@@ -11,7 +11,7 @@ from app.models import (
     get_current_time
 )
 from app.storage import storage
-from app.utils import sort_prompts_by_date, filter_prompts_by_collection, search_prompts
+from app.utils import filter_prompts_by_collection, search_prompts
 from app import __version__
 
 
@@ -51,19 +51,27 @@ def health_check():
 @app.get("/prompts", response_model=PromptList)
 def list_prompts(
     collection_id: Optional[str] = None,
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    sort_by: Optional[str] = Query("created_at"),
+    sort_order: Optional[str] = Query("desc")
 ):
-    """Lists all prompts, with optional filtering and searching.
+    """Lists all prompts, with optional filtering, searching, and sorting.
 
     Args:
         collection_id (Optional[str]): ID of the collection to filter by.
         search (Optional[str]): Search query to filter prompts.
+        sort_by (Optional[str]): Field by which to sort the prompts.
+        sort_order (Optional[str]): Order of sorting (asc or desc).
 
     Returns:
         PromptList: A list of prompts and total count.
 
-    Example Usage:
-        curl -X GET http://localhost:8000/prompts
+     Example Usage:
+        # List prompts sorted by title in ascending order
+        curl -X GET "http://localhost:8000/prompts?sort_by=title&sort_order=asc"
+        
+        # List prompts in a specific collection with a search term, sorted by creation date
+        curl -X GET "http://localhost:8000/prompts?collection_id=123&search=example&sort_by=created_at&sort_order=desc"
     """
     prompts = storage.get_all_prompts()
     
@@ -75,8 +83,16 @@ def list_prompts(
     if search:
         prompts = search_prompts(prompts, search)
     
-    # Sort by date (newest first)
-    prompts = sort_prompts_by_date(prompts, descending=True)
+    # Validate sort_by and sort_order
+    if sort_by not in ["title", "created_at"]:
+        raise HTTPException(status_code=400, detail="Invalid sorting field")
+    
+    if sort_order not in ["asc", "desc"]:
+        raise HTTPException(status_code=400, detail="Invalid sort order")
+
+    # Sort the prompts based on the sort_by field and order
+    reverse = sort_order == "desc"
+    prompts.sort(key=lambda x: getattr(x, sort_by), reverse=reverse)
     
     return PromptList(prompts=prompts, total=len(prompts))
 
@@ -218,16 +234,29 @@ def delete_prompt(prompt_id: str):
 # ============== Collection Endpoints ==============
 
 @app.get("/collections", response_model=CollectionList)
-def list_collections():
-    """Lists all collections.
+def list_collections(
+    filter_by: Optional[str] = Query(None),
+    search: Optional[str] = Query(None)
+):
+    """Lists all collections with optional filtering.
+
+    Args:
+        filter_by (Optional[str]): The field by which to filter collections.
+        search (Optional[str]): The search query to filter collections.
 
     Returns:
-        CollectionList: A list of collections and total count.
+        CollectionList: A list of collections and the total count.
 
     Example Usage:
-        curl -X GET http://localhost:8000/collections
+        curl -X GET "http://localhost:8000/collections?filter_by=name&search=Alpha"
     """
     collections = storage.get_all_collections()
+    
+    # Implement filtering logic if search is provided
+    if search and filter_by in ["name"]:  # Assuming name is the only filterable field here
+        search_lower = search.lower()
+        collections = [c for c in collections if search_lower in getattr(c, filter_by).lower()]
+    
     return CollectionList(collections=collections, total=len(collections))
 
 

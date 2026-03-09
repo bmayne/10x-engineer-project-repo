@@ -4,22 +4,6 @@ from typing import List
 from app.models import Prompt
 
 
-def sort_prompts_by_date(prompts: List[Prompt], descending: bool = True) -> List[Prompt]:
-    """Sorts a list of prompts by their creation date.
-
-    Args:
-        prompts (List[Prompt]): A list of Prompt objects to be sorted.
-        descending (bool, optional): Determines the sorting order. Defaults to True.
-
-    Returns:
-        List[Prompt]: The sorted list of Prompt objects.
-
-    Example Usage:
-        sorted_prompts = sort_prompts_by_date(prompts_list)
-    """
-    return sorted(prompts, key=lambda p: p.created_at, reverse=descending)
-
-
 def filter_prompts_by_collection(prompts: List[Prompt], collection_id: str) -> List[Prompt]:
     """Filters prompts by a specific collection ID.
 
@@ -49,6 +33,9 @@ def search_prompts(prompts: List[Prompt], query: str) -> List[Prompt]:
     Example Usage:
         search_results = search_prompts(prompts_list, 'keyword')
     """
+    if not query:
+        return []
+    
     query_lower = query.lower()
     return [
         p for p in prompts 
