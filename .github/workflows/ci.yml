@@ -29,7 +29,7 @@ jobs:
     - name: Run tests with coverage
       run: |
         coverage run -m pytest
-        coverage report -m --include='app/*'
+        coverage report -m --include='backend/app/*'
 
     - name: Check coverage
       run: |
