@@ -38,4 +38,4 @@ jobs:
     - name: Build Docker image
       if: success()  # Only run this step if all previous steps succeed
       run: |
-        docker-compose -f docker-compose.yml build
+        docker compose -f docker-compose.yml build
