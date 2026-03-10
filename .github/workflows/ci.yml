@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r backend/requirements.txt
         # Ensure tools for linting and test coverage are installed
         pip install flake8 coverage pytest
 
