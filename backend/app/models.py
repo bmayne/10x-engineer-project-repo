@@ -5,13 +5,11 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 from uuid import uuid4
 
+from app.date_utils import get_current_time
+
 
 def generate_id() -> str:
     return str(uuid4())
-
-
-def get_current_time() -> datetime:
-    return datetime.utcnow()
 
 
 # ============== Prompt Models ==============

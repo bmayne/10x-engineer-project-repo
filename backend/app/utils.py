@@ -1,5 +1,7 @@
 """Utility functions for PromptLab"""
 
+from fastapi import HTTPException
+from datetime import datetime
 from typing import List
 from app.models import Prompt
 
@@ -44,32 +46,6 @@ def search_prompts(prompts: List[Prompt], query: str) -> List[Prompt]:
     ]
 
 
-def validate_prompt_content(content: str) -> bool:
-    """Validates the content of a prompt.
-
-    Checks if the prompt content:
-    - Is not empty or just whitespace
-    - Contains at least 10 characters
-
-    Args:
-        content (str): The content of the prompt to validate.
-
-    Returns:
-        bool: True if the content is valid, otherwise False.
-
-    Example Usage:
-        is_valid = validate_prompt_content('Sample prompt content')
-    """
-    if not content or not content.strip():
-        return False
-    return len(content.strip()) >= 10
-
-
-def extract_variables(content: str) -> List[str]:
-    """Extract template variables from prompt content.
-    
-    Variables are in the format {{variable_name}}
-    """
-    import re
-    pattern = r'\{\{(\w+)\}\}'
-    return re.findall(pattern, content)
+def raise_if_not_found(entity, entity_type: str) -> None:
+    if not entity:
+        raise HTTPException(status_code=404, detail=f"{entity_type} not found")

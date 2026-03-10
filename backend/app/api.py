@@ -11,7 +11,8 @@ from app.models import (
     get_current_time
 )
 from app.storage import storage
-from app.utils import filter_prompts_by_collection, search_prompts
+from app.utils import filter_prompts_by_collection, raise_if_not_found, search_prompts
+from app.date_utils import update_timestamp
 from app import __version__
 
 
@@ -112,8 +113,7 @@ def get_prompt(prompt_id: str):
     """
     # This will now properly return a 404 if the prompt doesn't exist
     prompt = storage.get_prompt(prompt_id)
-    if not prompt:
-        raise HTTPException(status_code=404, detail="Prompt not found")
+    raise_if_not_found(prompt, "Prompt")
     return prompt
     
 
@@ -155,14 +155,12 @@ def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
         curl -X PUT http://localhost:8000/prompts/123 -d '{"title": "Updated Title"}'
     """
     existing = storage.get_prompt(prompt_id)
-    if not existing:
-        raise HTTPException(status_code=404, detail="Prompt not found")
+    raise_if_not_found(existing, "Prompt")
     
     # Validate collection if provided
     if prompt_data.collection_id:
         collection = storage.get_collection(prompt_data.collection_id)
-        if not collection:
-            raise HTTPException(status_code=400, detail="Collection not found")
+        raise_if_not_found(collection, "Collection")
 
     updated_prompt = Prompt(
         id=existing.id,
@@ -171,8 +169,8 @@ def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
         description=prompt_data.description,
         collection_id=prompt_data.collection_id,
         created_at=existing.created_at,
-        updated_at=get_current_time()
     )
+    update_timestamp(updated_prompt)
     
     return storage.update_prompt(prompt_id, updated_prompt)
 
@@ -192,22 +190,20 @@ def patch_prompt(prompt_id: str, prompt_data: PromptPatch):
         curl -X PATCH http://localhost:8000/prompts/123 -d '{"content": "Updated Content"}'
     """
     existing = storage.get_prompt(prompt_id)
-    if not existing:
-        raise HTTPException(status_code=404, detail="Prompt not found")
+    raise_if_not_found(existing, "Prompt")
 
     # Validate collection if provided
     if prompt_data.collection_id:
         collection = storage.get_collection(prompt_data.collection_id)
-        if not collection:
-            raise HTTPException(status_code=400, detail="Collection not found")
+        raise_if_not_found(collection, "Collection")
 
     # Update only provided fields
     update_data = existing.model_dump()
     updated_fields = prompt_data.model_dump(exclude_unset=True)
     update_data.update(updated_fields)
 
-    update_data['updated_at'] = get_current_time()
     updated_prompt = Prompt(**update_data)
+    update_timestamp(updated_prompt)
 
     storage.update_prompt(prompt_id, updated_prompt)
     return updated_prompt
@@ -243,8 +239,7 @@ def create_prompt_version(prompt_id: str, version_data: PromptVersion):
 def get_prompt_version(version_id: str):
     """Retrieve a specific prompt version by its ID."""
     version = storage.get_prompt_version(version_id)
-    if not version:
-        raise HTTPException(status_code=404, detail="Version not found")
+    raise_if_not_found(version, "Prompt Version")
     return version
 
 
@@ -259,8 +254,7 @@ def list_versions_for_prompt(prompt_id: str):
 def update_prompt_version(version_id: str, version_data: PromptVersion):
     """Update an existing prompt version identified by version ID."""
     updated_version = storage.update_prompt_version(version_id, version_data.model_dump(exclude_unset=True))
-    if not updated_version:
-        raise HTTPException(status_code=404, detail="Version not found")
+    raise_if_not_found(updated_version, "Prompt Version")
     return updated_version
 
 
@@ -307,8 +301,7 @@ def get_collection(collection_id: str):
         curl -X GET http://localhost:8000/collections/456
     """
     collection = storage.get_collection(collection_id)
-    if not collection:
-        raise HTTPException(status_code=404, detail="Collection not found")
+    raise_if_not_found(collection, "Collection")
     return collection
 
 

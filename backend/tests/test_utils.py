@@ -1,5 +1,5 @@
 import pytest
-from app.utils import filter_prompts_by_collection, search_prompts, validate_prompt_content, extract_variables
+from app.utils import filter_prompts_by_collection, search_prompts
 from app.models import Prompt
 
 class TestUtils:
@@ -22,16 +22,6 @@ class TestUtils:
         results = search_prompts(prompts, "hello")
         assert len(results) == 1
         assert results[0].title == "Hello World"
-
-    def test_validate_prompt_content(self):
-        assert validate_prompt_content("Valid content") is True
-        assert validate_prompt_content("") is False
-        assert validate_prompt_content(" ") is False
-
-    def test_extract_variables(self):
-        content = "This is a {{variable1}} and {{variable2}} test."
-        variables = extract_variables(content)
-        assert variables == ["variable1", "variable2"]
 
     def test_edge_case_empty_search(self):
         prompts = [Prompt(id="1", title="Sample", content="Content")]
