@@ -202,3 +202,15 @@ class HealthResponse(BaseModel):
     status: str
     version: str
 
+
+class PromptVersion(BaseModel):
+    id: str = Field(default_factory=generate_id)
+    prompt_id: Optional[str] = None
+    title: str
+    content: Optional[str] = Field(None, min_length=1)
+    created_at: datetime = Field(default_factory=get_current_time)
+
+
+class PromptVersionList(BaseModel):
+    versions: List[PromptVersion]
+    total: int

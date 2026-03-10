@@ -1,6 +1,6 @@
 import pytest
 from app.storage import storage
-from app.models import Prompt, Collection
+from app.models import Prompt, PromptVersion, Collection
 from uuid import uuid4
 from pydantic import ValidationError
 
@@ -56,6 +56,54 @@ class TestStorage:
 
         # Retrieve and assert both prompts are persisted
         assert len(storage.get_all_prompts()) >= 2
+
+    def test_create_and_get_prompt_version(self):
+        # Create a PromptVersion
+        prompt_id = str(uuid4())
+        version_data = PromptVersion(prompt_id=prompt_id, title="Version 1", content="Initial content")
+        created_version = storage.create_prompt_version(version_data)
+
+        # Retrieve the PromptVersion by ID
+        retrieved_version = storage.get_prompt_version(created_version.id)
+        assert retrieved_version is not None
+        assert retrieved_version.title == "Version 1"
+        assert retrieved_version.content == "Initial content"
+
+    def test_list_versions_for_prompt(self):
+        # Create and add multiple versions for a specific prompt
+        prompt_id = str(uuid4())
+        version1 = PromptVersion(prompt_id=prompt_id, title="Version 1", content="Content 1")
+        version2 = PromptVersion(prompt_id=prompt_id, title="Version 2", content="Content 2")
+
+        storage.create_prompt_version(version1)
+        storage.create_prompt_version(version2)
+
+        # List all versions for the prompt_id
+        versions = storage.list_versions_for_prompt(prompt_id)
+        assert len(versions) == 2
+        titles = {v.title for v in versions}
+        assert "Version 1" in titles
+        assert "Version 2" in titles
+
+    def test_update_prompt_version(self):
+        # Create a PromptVersion to update
+        prompt_id = str(uuid4())
+        version = PromptVersion(prompt_id=prompt_id, title="Initial Version", content="Initial content")
+        storage.create_prompt_version(version)
+
+        # Define the update and execute
+        update_data = {"title": "Updated Version"}
+        updated_version = storage.update_prompt_version(version.id, update_data)
+
+        # Verify update
+        assert updated_version is not None
+        assert updated_version.title == "Updated Version"
+        assert updated_version.content == "Initial content"
+
+    def test_get_non_existent_prompt_version(self):
+        # Attempt to retrieve a non-existing version
+        retrieved_version = storage.get_prompt_version("non-existent-id")
+        assert retrieved_version is None
 
     def test_create_collection(self):
         # Create a new collection

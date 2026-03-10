@@ -5,7 +5,7 @@ In a production environment, this would be replaced with a database.
 """
 
 from typing import Dict, List, Optional
-from app.models import Prompt, Collection
+from app.models import Prompt, PromptVersion, Collection
 
 
 class Storage:
@@ -23,6 +23,7 @@ class Storage:
         """Initializes a new Storage instance with empty storage."""
         self._prompts: Dict[str, Prompt] = {}
         self._collections: Dict[str, Collection] = {}
+        self._prompt_versions: Dict[str, PromptVersion] = {}
     
     # ============== Prompt Operations ==============
     
@@ -101,6 +102,24 @@ class Storage:
             return True
         return False
     
+    def create_prompt_version(self, version: PromptVersion) -> PromptVersion:
+        self._prompt_versions[version.id] = version
+        return version
+
+    def get_prompt_version(self, version_id: str) -> Optional[PromptVersion]:
+        return self._prompt_versions.get(version_id)
+
+    def list_versions_for_prompt(self, prompt_id: str) -> List[PromptVersion]:
+        return [v for v in self._prompt_versions.values() if v.prompt_id == prompt_id]
+
+    def update_prompt_version(self, version_id: str, version_data: dict) -> Optional[PromptVersion]:
+        version = self._prompt_versions.get(version_id)
+        if version:
+            for key, value in version_data.items():
+                setattr(version, key, value)
+            return version
+        return None
+
     # ============== Collection Operations ==============
     
     def create_collection(self, collection: Collection) -> Collection:
@@ -184,6 +203,7 @@ class Storage:
         """
         self._prompts.clear()
         self._collections.clear()
+        self._prompt_versions.clear()
 
 
 # Global storage instance

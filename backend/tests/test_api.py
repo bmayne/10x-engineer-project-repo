@@ -166,6 +166,78 @@ class TestPrompts:
         # Test sorting order by title
         assert prompts[0]["title"] == "First"
 
+    def test_create_prompt_version(self, client: TestClient, sample_prompt_data):
+        # Create a prompt first
+        create_response = client.post("/prompts", json=sample_prompt_data)
+        assert create_response.status_code == 201
+        prompt_id = create_response.json()["id"]
+
+        # Define version data for creation
+        version_data = {"title": "Version 1", "content": "Content for version 1"}
+
+        # Create a new version for this prompt
+        version_response = client.post(f"/prompts/{prompt_id}/versions", json=version_data)
+        assert version_response.status_code == 201
+        
+        # Validate the created version
+        version_info = version_response.json()
+        assert version_info["title"] == "Version 1"
+        assert version_info["content"] == "Content for version 1"
+        assert "id" in version_info
+
+    def test_get_prompt_version(self, client: TestClient, sample_prompt_data):
+        # Create prompt and version
+        create_response = client.post("/prompts", json=sample_prompt_data)
+        prompt_id = create_response.json()["id"]
+        version_data = {"title": "Version for retrieval", "content": "Content"}
+        version_response = client.post(f"/prompts/{prompt_id}/versions", json=version_data)
+        version_id = version_response.json()["id"]
+
+        # Retrieve the specific version
+        response = client.get(f"/prompts/versions/{version_id}")
+        assert response.status_code == 200
+        
+        # Validate the retrieved version data
+        version_info = response.json()
+        assert version_info["title"] == "Version for retrieval"
+        assert version_info["content"] == "Content"
+
+    def test_list_versions_for_prompt(self, client: TestClient, sample_prompt_data):
+        # Create prompt with multiple versions
+        create_response = client.post("/prompts", json=sample_prompt_data)
+        prompt_id = create_response.json()["id"]
+        client.post(f"/prompts/{prompt_id}/versions", json={"title": "V1", "content": "Content 1"})
+        client.post(f"/prompts/{prompt_id}/versions", json={"title": "V2", "content": "Content 2"})
+
+        # Retrieve all versions for the prompt
+        response = client.get(f"/prompts/{prompt_id}/versions")
+        assert response.status_code == 200
+        
+        # Validate the list of versions
+        versions = response.json()["versions"]
+        assert len(versions) == 2
+        titles = {version["title"] for version in versions}
+        assert "V1" in titles
+        assert "V2" in titles
+
+    def test_update_prompt_version(self, client: TestClient, sample_prompt_data):
+        # Create a prompt and a version to update
+        create_response = client.post("/prompts", json=sample_prompt_data)
+        prompt_id = create_response.json()["id"]
+        version_data = {"title": "Initial Version", "content": "Initial content"}
+        version_response = client.post(f"/prompts/{prompt_id}/versions", json=version_data)
+        version_id = version_response.json()["id"]
+
+        # Define update data and perform update
+        update_data = {"title": "Updated Version"}
+        update_response = client.put(f"/prompts/versions/{version_id}", json=update_data)
+        assert update_response.status_code == 200
+        
+        # Validate the update
+        updated_version = update_response.json()
+        assert updated_version["title"] == "Updated Version"
+        assert updated_version["content"] == "Initial content"  # Ensure content remains unchanged
+
 class TestCollections:
     """Tests for collection endpoints."""
     

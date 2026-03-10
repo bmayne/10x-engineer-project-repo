@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 
 from app.models import (
-    Prompt, PromptCreate, PromptUpdate, PromptPatch,
-    Collection, CollectionCreate,
+    Prompt, PromptCreate, PromptUpdate, PromptPatch, PromptVersion,
+    PromptVersionList, Collection, CollectionCreate,
     PromptList, CollectionList, HealthResponse,
     get_current_time
 )
@@ -229,6 +229,39 @@ def delete_prompt(prompt_id: str):
     if not storage.delete_prompt(prompt_id):
         raise HTTPException(status_code=404, detail="Prompt not found")
     return None
+
+
+@app.post("/prompts/{prompt_id}/versions", response_model=PromptVersion, status_code=201)
+def create_prompt_version(prompt_id: str, version_data: PromptVersion):
+    """Create a new version for a specific prompt."""
+    version = PromptVersion(**version_data.model_dump())
+    version.prompt_id = prompt_id
+    return storage.create_prompt_version(version)
+
+
+@app.get("/prompts/versions/{version_id}", response_model=PromptVersion)
+def get_prompt_version(version_id: str):
+    """Retrieve a specific prompt version by its ID."""
+    version = storage.get_prompt_version(version_id)
+    if not version:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return version
+
+
+@app.get("/prompts/{prompt_id}/versions", response_model=PromptVersionList)
+def list_versions_for_prompt(prompt_id: str):
+    """List all versions associated with a specific prompt ID."""
+    versions = storage.list_versions_for_prompt(prompt_id)
+    return PromptVersionList(versions=versions, total=len(versions))
+
+
+@app.put("/prompts/versions/{version_id}", response_model=PromptVersion)
+def update_prompt_version(version_id: str, version_data: PromptVersion):
+    """Update an existing prompt version identified by version ID."""
+    updated_version = storage.update_prompt_version(version_id, version_data.model_dump(exclude_unset=True))
+    if not updated_version:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return updated_version
 
 
 # ============== Collection Endpoints ==============
