@@ -1,0 +1,15 @@
+/* Styles for the CollectionList component */
+.collectionList {
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+.collectionList ul {
+    list-style-type: none;
+    padding: 0;
+}
+.collectionList li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}

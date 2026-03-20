@@ -1,0 +1,8 @@
+/* Styles for the SearchBar component */
+.searchBar {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}

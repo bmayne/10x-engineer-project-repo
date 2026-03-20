@@ -1,0 +1,15 @@
+/* Styles for the PromptForm component */
+.promptForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.promptForm label {
+    font-weight: bold;
+}
+.promptForm input,
+.promptForm textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

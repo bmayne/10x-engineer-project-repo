@@ -1,0 +1,14 @@
+/* Styles for the CollectionForm component */
+.collectionForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.collectionForm label {
+    font-weight: bold;
+}
+.collectionForm input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

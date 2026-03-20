@@ -1,0 +1,6 @@
+/* Styles for the PromptList component */
+.promptList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
