@@ -29,3 +29,33 @@
   flex: 1; /* Main content expands to fill remaining space */
   padding: 20px;
 }
+
+@media (max-width: 768px) {
+    .mainContainer {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .mainContent {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        font-size: 18px; /* Adjust font sizes */
+    }
+
+    .sidebar {
+        display: none; /* Hide sidebar on very small screens */
+    }
+
+    .mainContent {
+        padding: 10px; /* Less padding on small screens */
+    }
+}
