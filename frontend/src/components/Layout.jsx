@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import styles from '../styles/Layout.module.css';
-import PromptList from './PromptList';
 import PromptDetail from './PromptDetail';
-import CollectionDetail from './CollectionDetail'; // Import CollectionDetail component
-import Button from './shared/Button';
+import CollectionDetail from './CollectionDetail'; // 
+import Spinner from './Spinner';
 import Modal from './shared/Modal';
 import PromptForm from './PromptForm';
 import CollectionForm from './CollectionForm';
@@ -21,7 +20,8 @@ const Layout = () => {
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [collectionPrompts, setCollectionPrompts] = useState([]); // State to hold collection-specific prompts
+  const [collectionPrompts, setCollectionPrompts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
 
   useEffect(() => {
@@ -32,6 +32,8 @@ const Layout = () => {
       setSelectedPrompt(null); // Clear selected prompt
     }
 
+    setLoading(true);
+
     if (selectedView === 'Prompts') {
       const fetchPrompts = async () => {
         try {
@@ -39,6 +41,8 @@ const Layout = () => {
           setPrompts(data.prompts);
         } catch (error) {
           console.error('Failed to fetch prompts:', error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -50,9 +54,10 @@ const Layout = () => {
           setCollections(data.collections);
         } catch (error) {
           console.error('Failed to fetch collections:', error);
+        } finally {
+          setLoading(false);
         }
       };
-
       fetchCollections();
     }
   }, [selectedView]);
@@ -140,21 +145,27 @@ const Layout = () => {
 
   const handleSelectPrompt = async (prompt) => {
     try {
+      setLoading(true);
       const fetchedPrompt = await getPrompt(prompt.id);
       setSelectedPrompt(fetchedPrompt);
     } catch (error) {
       console.error('Failed to fetch prompt details:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSelectCollection = async (collection) => {
     try {
+      setLoading(true);
       const fetchedCollection = await getCollection(collection.id);
       setSelectedCollection(fetchedCollection);
       const fetchedPrompts = await getPromptsByCollection(collection.id); // Fetch associated prompts
       setCollectionPrompts(fetchedPrompts.prompts);
     } catch (error) {
       console.error('Failed to fetch collection details:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -192,7 +203,13 @@ const Layout = () => {
           onAddClick={selectedView === 'Prompts' ? handleAddPrompt : handleAddCollection}
         />
         <main className={styles.mainContent}>
-          {renderContent()}
+          {loading ? (
+            <Spinner />
+          ) : (
+          <>
+            {renderContent()}
+          </>
+          )}
         </main>
       </div>
       <Modal isOpen={isPromptModalOpen} onClose={handleModalClose}>
