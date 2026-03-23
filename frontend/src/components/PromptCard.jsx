@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './PromptCard.module.css';
+import styles from '../styles/PromptCard.module.css';
 
 const PromptCard = ({ prompt }) => {
     return (

@@ -1,0 +1,31 @@
+.layout {
+  display: flex;
+  flex-direction: column; /* Stack Header, then content below */
+  height: 100vh; /* Full viewport height */
+}
+
+.header {
+  background-color: #333; /* Example color */
+  color: #fff;
+  padding: 10px 20px;
+  text-align: center;
+}
+
+.mainContainer {
+  display: flex;
+  flex: 1; /* Allows mainContainer to take up remaining space */
+}
+
+.sidebar {
+  width: 250px; /* Fixed width for sidebar */
+  background-color: #f4f4f4;
+  border-right: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto; /* Scroll for overflow */
+}
+
+.mainContent {
+  flex: 1; /* Main content expands to fill remaining space */
+  padding: 20px;
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './CollectionForm.module.css';
+import styles from '../styles/CollectionForm.module.css';
 
 const CollectionForm = ({ onSubmit }) => {
     const [name, setName] = useState('');

@@ -1,15 +1,26 @@
 import React from 'react';
-import styles from './Sidebar.module.css';
+import styles from '../styles/Sidebar.module.css';
 
-const Sidebar = () => {
+const Sidebar = ({ title, items, onItemClick, onAddClick }) => {
     return (
         <aside className={styles.sidebar}>
+            <div className={styles.sidebarHeader}>
+                <h2>{title}</h2>
+                <button 
+                    aria-label={`Add ${title}`} 
+                    className={styles.addButton} 
+                    onClick={onAddClick} // Trigger the add action here
+                >
+                    +
+                </button>
+            </div>
             <nav>
                 <ul>
-                    <li>Collection 1</li>
-                    <li>Collection 2</li>
-                    <li>Collection 3</li>
-                    {/* Add more collections or links as needed */}
+                    {items.map((item) => (
+                        <li key={item.id} onClick={() => onItemClick(item)}>
+                            {title === 'Prompts' ? item.title : item.name}
+                        </li>
+                    ))}
                 </ul>
             </nav>
         </aside>

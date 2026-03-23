@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './CollectionList.module.css';
+import styles from '../styles/CollectionList.module.css';
 
 const CollectionList = ({ collections }) => {
     return (

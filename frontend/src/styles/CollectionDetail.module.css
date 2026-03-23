@@ -1,0 +1,17 @@
+.collectionDetail {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    text-align: left;
+}
+
+.collectionDetail h2 {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.collectionDetail p, .collectionDetail ul {
+    margin: 8px 0;
+}

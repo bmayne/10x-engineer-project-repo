@@ -36,9 +36,15 @@ PromptLab is a robust AI Prompt Engineering Platform designed to facilitate the 
    ```bash
    cd backend
    pip install -r requirements.txt
-   python main.py
+   uvicorn main:app --reload
    ```
-
+3. **Set up and run the frontend**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+The frontend application will be served, typically at [http://localhost:5173](http://localhost:5173).
 The API will be accessible at: [http://localhost:8000](http://localhost:8000).
 
 API Documentation can be viewed at: [http://localhost:8000/docs](http://localhost:8000/docs).

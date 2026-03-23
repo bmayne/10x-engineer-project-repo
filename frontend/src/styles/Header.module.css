@@ -1,0 +1,38 @@
+/* Styles for Header.module.css */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.navigation ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navigation li {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 5px;
+    border-bottom: 2px solid transparent;
+}
+
+.activeTab {
+    border-bottom-color: #007bff; /* Active tab indicator */
+    font-weight: bold;
+}
+
+.inactiveTab:hover {
+    border-bottom-color: #ddd;
+}

@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://obscure-spoon-jvp9554jqvc769-8000.app.github.dev';
 
 const handleResponse = async (response) => {
     if (!response.ok) {

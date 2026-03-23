@@ -1,6 +1,6 @@
 import React from 'react';
 import PromptCard from './PromptCard';
-import styles from './PromptList.module.css';
+import styles from '../styles/PromptList.module.css';
 
 const PromptList = ({ prompts }) => {
     return (
