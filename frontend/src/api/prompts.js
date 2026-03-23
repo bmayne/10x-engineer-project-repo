@@ -8,6 +8,10 @@ export const getPrompt = async (id) => {
     return fetchWrapper(`/prompts/${id}`);
 };
 
+export const getPromptsByCollection = async (collectionId) => {
+    return fetchWrapper(`/prompts?collection_id=${collectionId}`);
+};
+
 export const createPrompt = async (data) => {
     return fetchWrapper('/prompts', {
         method: 'POST',

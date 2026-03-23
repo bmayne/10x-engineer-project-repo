@@ -9,8 +9,8 @@ import Button from './shared/Button';
 import Modal from './shared/Modal';
 import PromptForm from './PromptForm';
 import CollectionForm from './CollectionForm';
-import { getPrompts, createPrompt, updatePrompt, deletePrompt } from '../api/prompts';
-import { getCollections, createCollection, deleteCollection } from '../api/collections';
+import { getPrompt, getPrompts, getPromptsByCollection, createPrompt, updatePrompt, deletePrompt } from '../api/prompts';
+import { getCollection, getCollections, createCollection, deleteCollection } from '../api/collections';
 
 const Layout = () => {
   const [selectedView, setSelectedView] = useState('Prompts');
@@ -21,6 +21,8 @@ const Layout = () => {
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [collectionPrompts, setCollectionPrompts] = useState([]); // State to hold collection-specific prompts
+
 
   useEffect(() => {
     // Reset selected prompt or collection when switching views
@@ -136,6 +138,26 @@ const Layout = () => {
     }
   };
 
+  const handleSelectPrompt = async (prompt) => {
+    try {
+      const fetchedPrompt = await getPrompt(prompt.id);
+      setSelectedPrompt(fetchedPrompt);
+    } catch (error) {
+      console.error('Failed to fetch prompt details:', error);
+    }
+  };
+
+  const handleSelectCollection = async (collection) => {
+    try {
+      const fetchedCollection = await getCollection(collection.id);
+      setSelectedCollection(fetchedCollection);
+      const fetchedPrompts = await getPromptsByCollection(collection.id); // Fetch associated prompts
+      setCollectionPrompts(fetchedPrompts.prompts);
+    } catch (error) {
+      console.error('Failed to fetch collection details:', error);
+    }
+  };
+
   const renderContent = () => {
     if (selectedView === 'Prompts') {
       return (
@@ -149,7 +171,7 @@ const Layout = () => {
           {selectedCollection && (
             <CollectionDetail
               collection={selectedCollection}
-              prompts={prompts.filter(prompt => prompt.collection_id === selectedCollection.id)} onDelete={handleDeleteCollection}
+              prompts={collectionPrompts} onDelete={handleDeleteCollection}
             />
           )}
         </div>
@@ -166,7 +188,7 @@ const Layout = () => {
           title={selectedView}
           items={selectedView === 'Prompts' ? prompts : collections}
           selectedItem={selectedView === 'Prompts' ? selectedPrompt : selectedCollection}
-          onItemClick={selectedView === 'Prompts' ? setSelectedPrompt : setSelectedCollection}
+          onItemClick={selectedView === 'Prompts' ? handleSelectPrompt : handleSelectCollection}
           onAddClick={selectedView === 'Prompts' ? handleAddPrompt : handleAddCollection}
         />
         <main className={styles.mainContent}>
