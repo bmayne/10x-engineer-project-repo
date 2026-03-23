@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '../styles/Sidebar.module.css';
 
-const Sidebar = ({ title, items, onItemClick, onAddClick }) => {
+const Sidebar = ({ title, items, selectedItem, onItemClick, onAddClick }) => {
     return (
         <aside className={styles.sidebar}>
             <div className={styles.sidebarHeader}>
@@ -17,7 +17,8 @@ const Sidebar = ({ title, items, onItemClick, onAddClick }) => {
             <nav>
                 <ul>
                     {items.map((item) => (
-                        <li key={item.id} onClick={() => onItemClick(item)}>
+                        <li key={item.id} onClick={() => onItemClick(item)}
+                        className={item.id === selectedItem?.id ? styles.selectedItem : ''}>
                             {title === 'Prompts' ? item.title : item.name}
                         </li>
                     ))}

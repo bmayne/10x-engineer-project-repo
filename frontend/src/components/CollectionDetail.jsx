@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '../styles/CollectionDetail.module.css';
 
-const CollectionDetail = ({ collection, prompts }) => {
+const CollectionDetail = ({ collection, prompts, onEdit, onDelete }) => {
     return (
         <div className={styles.collectionDetail}>
             <h2>{collection.name}</h2>
@@ -11,6 +11,9 @@ const CollectionDetail = ({ collection, prompts }) => {
                     <li key={prompt.id}>{prompt.title}</li>
                 ))}
             </ul>
+            <div className={styles.buttonContainer}>
+                <button className={styles.deleteButton} onClick={onDelete}>Delete</button>
+            </div>
         </div>
     );
 };

@@ -15,3 +15,19 @@
 .collectionDetail p, .collectionDetail ul {
     margin: 8px 0;
 }
+
+.buttonContainer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.editButton,
+.deleteButton {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}

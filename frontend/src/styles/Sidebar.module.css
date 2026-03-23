@@ -47,3 +47,8 @@
 .addButton:hover {
     color: #0056b3;
 }
+
+.selectedItem {
+    background-color: #d0ebff; /* Highlight color for selected item */
+    font-weight: bold;
+}
