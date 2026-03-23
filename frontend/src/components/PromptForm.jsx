@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../styles/PromptForm.module.css';
 import { getCollections } from '../api/collections';
 
-const PromptForm = ({ onSubmit, initialData = {}}) => {
+const PromptForm = ({ onSubmit, initialData = {}, errorMessage}) => {
     const [title, setTitle] = useState(initialData.title || '');
     const [description, setDescription] = useState(initialData.description || '');
     const [content, setContent] = useState(initialData.content || '');
     const [collectionId, setCollectionId] = useState(initialData.collection_id || '');
     const [collections, setCollections] = useState([]); // State for collections
+    const titleRef = useRef(null); // Reference to the title input
+
+
+    useEffect(() => {
+        titleRef.current?.focus(); // Automatically focus on title input on component mount
+    }, []);
 
     useEffect(() => {
         const fetchCollections = async () => {
@@ -31,9 +37,10 @@ const PromptForm = ({ onSubmit, initialData = {}}) => {
 
     return (
         <form className={styles.promptForm} onSubmit={handleSubmit}>
+            {errorMessage && <div className={styles.error}>{errorMessage}</div>}
             <div>
                 <label>Title</label>
-                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                <input type="text" ref={titleRef} value={title} onChange={(e) => setTitle(e.target.value)} required />
             </div>
             <div>
                 <label>Description</label>

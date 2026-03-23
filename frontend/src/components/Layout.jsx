@@ -22,6 +22,8 @@ const Layout = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [collectionPrompts, setCollectionPrompts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // State for error messages
+
 
 
   useEffect(() => {
@@ -76,6 +78,7 @@ const Layout = () => {
   const handleModalClose = () => {
     setIsPromptModalOpen(false);
     setIsCollectionModalOpen(false);
+    setErrorMessage('');
   };
 
   const handlePromptSubmit = async (promptData) => {
@@ -93,8 +96,13 @@ const Layout = () => {
         setSelectedPrompt(newPrompt);
       }
       setIsPromptModalOpen(false);
+      setErrorMessage(''); // Clear error if successful
     } catch (error) {
-      console.error('Failed to create prompt:', error);
+      if (error.data && error.data.detail) {
+        setErrorMessage(error.data.detail); // Display detailed error message
+      } else {
+        setErrorMessage('Failed to save prompt.'); // Generic fallback message
+      }
     }
   };
 
@@ -104,8 +112,13 @@ const Layout = () => {
       setCollections((prevCollections) => [...prevCollections, newCollection]);
       setSelectedCollection(newCollection);
       setIsCollectionModalOpen(false);
+      setErrorMessage(''); // Clear error if successful
     } catch (error) {
-      console.error('Failed to create collection:', error);
+      if (error.data && error.data.detail) {
+        setErrorMessage(error.data.detail); // Display detailed error message
+      } else {
+        setErrorMessage('Failed to save collection.'); // Generic fallback message
+      }
     }
   };
 
@@ -213,10 +226,10 @@ const Layout = () => {
         </main>
       </div>
       <Modal isOpen={isPromptModalOpen} onClose={handleModalClose}>
-        <PromptForm onSubmit={handlePromptSubmit} initialData={isEditing ? selectedPrompt : {}}/>
+        <PromptForm onSubmit={handlePromptSubmit} initialData={isEditing ? selectedPrompt : {}} errorMessage={errorMessage}/>
       </Modal>
       <Modal isOpen={isCollectionModalOpen} onClose={handleModalClose}>
-        <CollectionForm onSubmit={handleCollectionSubmit} />
+        <CollectionForm onSubmit={handleCollectionSubmit} errorMessage={errorMessage}/>
       </Modal>
     </div>
   );

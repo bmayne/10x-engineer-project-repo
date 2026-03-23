@@ -130,6 +130,10 @@ def create_prompt(prompt_data: PromptCreate):
     Example Usage:
         curl -X POST http://localhost:8000/prompts -d '{"title": "New Prompt"}'
     """
+    existing_prompts = storage.get_all_prompts()
+    if any(p for p in existing_prompts if p.title == prompt_data.title):
+        raise HTTPException(status_code=400, detail="Prompt title already exists")
+
     # Validate collection exists if provided
     if prompt_data.collection_id:
         collection = storage.get_collection(prompt_data.collection_id)
@@ -161,6 +165,10 @@ def update_prompt(prompt_id: str, prompt_data: PromptUpdate):
     if prompt_data.collection_id:
         collection = storage.get_collection(prompt_data.collection_id)
         raise_if_not_found(collection, "Collection")
+
+    all_prompts = storage.get_all_prompts()
+    if any(p for p in all_prompts if p.title == prompt_data.title and p.id != prompt_id):
+        raise HTTPException(status_code=400, detail="Prompt title already exists")
 
     updated_prompt = Prompt(
         id=existing.id,
@@ -201,6 +209,11 @@ def patch_prompt(prompt_id: str, prompt_data: PromptPatch):
     update_data = existing.model_dump()
     updated_fields = prompt_data.model_dump(exclude_unset=True)
     update_data.update(updated_fields)
+
+    if 'title' in updated_fields:  # Validate title only if it's being updated
+        all_prompts = storage.get_all_prompts()
+        if any(p for p in all_prompts if p.title == updated_fields['title'] and p.id != prompt_id):
+            raise HTTPException(status_code=400, detail="Prompt title already exists")
 
     updated_prompt = Prompt(**update_data)
     update_timestamp(updated_prompt)
@@ -318,6 +331,10 @@ def create_collection(collection_data: CollectionCreate):
     Example Usage:
         curl -X POST http://localhost:8000/collections -d '{"name": "New Collection"}'
     """
+    existing_collections = storage.get_all_collections()
+    if any(c for c in existing_collections if c.name == collection_data.name):
+        raise HTTPException(status_code=400, detail="Collection name already exists")
+
     collection = Collection(**collection_data.model_dump())
     return storage.create_collection(collection)
 
